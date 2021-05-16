@@ -1,0 +1,84 @@
+:root {
+  --backgroundColor: #eee;
+  --containerColor: #fff;
+  --textColor: #333;
+  --lightColor: #888;
+  --buttonColor: rgb(0, 156, 26);
+  --buttonTextColor: #fff;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--backgroundColor);
+  color: var(--textColor);
+}
+#App {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container {
+  background-color: var(--containerColor);
+  min-width: 500px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.container:hover {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.input {
+  width: calc(100% - 20px);
+  height: 40px;
+  border-radius: 10px;
+  border: solid 1px var(--textColor);
+  outline: none;
+  margin-bottom: 20px;
+  font-size: 16px;
+  padding: 0px 10px;
+  color: var(--textColor);
+}
+
+.input::placeholder {
+  color: var(--buttonColor);
+  opacity: 0.4;
+}
+
+.label {
+  color: var(--lightColor);
+  font-weight: bolder;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.input:focus {
+  border-color: var(--buttonColor);
+}
+
+.input:active {
+  border-color: var(--buttonColor);
+}
+
+.button {
+  width: 70px;
+  height: 40px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+
+  background-color: var(--buttonColor);
+  color: var(--buttonTextColor);
+  font-size: 16px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+}
