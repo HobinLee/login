@@ -1,4 +1,4 @@
-const END_POINT = 'http://localhost:3001';
+const END_POINT = 'http://127.0.0.1:3001';
 
 const api = {
   fetchLogin: async (email, password) => {
@@ -6,21 +6,20 @@ const api = {
       let loginData = {
         method: 'POST',
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
         headers: {
-            'Content-Type': 'application/json'
+          'Content-Type': 'application/json'
         }
       };
 
       const res = await fetch(`${END_POINT}/login`, loginData);
-
-      const data = await res.json();
-
-      if (data.statusCode === 200) {
+      console.log(res);
+      if (res.status === 200) {
         return {
           isError: false,
-          token: data.token,
         }
       } else {
+        const data = await res.json();
         return {
           isError: true,
           errorData: data,
@@ -70,6 +69,43 @@ const api = {
         }
       }
     }
+  },
+  fetchInit: async () => {
+    let loginData = {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    
+    const res = await fetch(`${END_POINT}/auth`, loginData);
+    
+    const data = await res.json();
+
+    if (data.statusCode === 200) {
+      return {
+        isError: false,
+        user: data.user,
+      }
+    } else {
+      return {
+        isError: true,
+        message: data.message,
+      }
+    }
+  },
+  fetchLogout: async () => {
+    let logoutData = {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    const res = await fetch(`${END_POINT}/logout`, logoutData);
+
+    return;
   }
 }
 

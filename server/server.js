@@ -1,60 +1,101 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const FileStore = require('session-file-store')(session);
+const jwt = require('jsonwebtoken');
+
 const app = express();
  
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin: 'http://127.0.0.1:5500',
+  optionsSuccessStatus: 200
+}))
 
 app.use(bodyParser.json());
 
+app.use(cookieParser());
+
 const auth = {
   email: 'viny5120@gmail.com',
-  pw: 'asdfasdf',
+  pw: '$2b$10$ijb6/.pdIuX9mOPOREan4OBbqGZZ8Ualbe4ObTv5zgExiVwN4gube',
   token: '1234567890'
 }
-const userInfo = {
-  '1234567890': {
-    name: 'Hobin Lee',
-    email: 'viny5120@gmail.com'
-  }
+
+let token = null;
+
+const user = {
+  name: 'Hobin Lee',
+  email: 'viny5120@gmail.com'
 }
 
+app.get('/auth', function (req, res) {
+  const tok = req.cookies.token;
+  console.log('tok: ', tok);
+  console.log('token: ', token);
+  if (!tok || !token) {
+    res.json({
+      statusCode: 200,
+      user: null
+    })
+  } else if (token === tok) {
+    console.log('login');
+    res.json({
+      statusCode: 200,
+      user: user
+    });
+  } else {
+    res.json({
+      statusCode: 300,
+      message: '잘못된 토큰 값입니다.'
+    });
+  }
+})
+
 app.post('/login', function(req, res) {
-  setTimeout(() => {
-    try {
-      if ((Math.random() * 5) < 1) throw new Error('?');
-      if ((req.body.email === auth.email)
-        && (req.body.password === auth.pw)) {
-        res.json({
-          statusCode: 200,
-          token: auth.token
-        });
-      } else {
-        throw ({
-          statusCode: 500,
-          message: '아이디 혹은 비밀번호가 잘 못 입력되었습니다.'
-        });
-      }
-    } catch (err) {
-      if (err.statusCode) {
-        res.json(err);
-      } else {
-        res.json({
-          statusCode: 503,
-          message: '네트워크 연결 실패. 잠시 후 다시 시도해주세요.',
-        });
-      }
+    if(req.body.email === auth.email) {
+      bcrypt.compare(req.body.password, auth.pw, (err, result) => {
+        if (result) {
+          token = jwt.sign(req.body.email, "hovLee");
+          res.cookie('token', token, {
+            httpOnly: true,
+            path: "auth",
+          }).sendStatus(200);
+        } else {
+          //비밀번호 입력 오류
+          res.json({
+            statusCode: 500,
+            message: '아이디 혹은 비밀번호가 잘 못 입력되었습니다.'
+          });
+        }
+      })
+    } else {
+      //아이디 입력 오류
+      res.json({
+        statusCode: 500,
+        message: '아이디 혹은 비밀번호가 잘 못 입력되었습니다.'
+      });
     }
-  }, 1000); 
+});
+
+app.get('/logout', (req, res) => {
+  console.log('logout');
+  res.clearCookie('token', {
+    path: "/"
+  }).sendStatus(200);
+  token = null;
 });
 
 app.get('/user', function(req, res) {
-  const token = req.headers.authorization;
+  const tok = req.headers.authorization;
 
-  if (userInfo[token]) {
+  if (token === tok) {
     res.json({
       statusCode: 200,
-      user: userInfo[token]
+      user: user
     });
   } else {
     res.json({

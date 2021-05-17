@@ -48,14 +48,13 @@ export class LoginPage {
         if (data.isError) {
           alert(data.errorData.message);
         } else {
-          document.cookie = `token=${data.token}`
-          this.handleGetUserInfo(data.token);
+          this.handleGetUserInfo();
         }
       });
   }
 
-  handleGetUserInfo(token) {
-    api.fetchUser(token)
+  handleGetUserInfo() {
+    api.fetchInit()
       .then(data => {
         if (data.isError) {
           console.log('Failed to get user info');
@@ -66,7 +65,9 @@ export class LoginPage {
   }
 
   handleLogout() {
-    this.setState(null);
+    api.fetchLogout().then(data => {
+      this.setState(null);
+    });
   }
 
   checkSubmitable() {
